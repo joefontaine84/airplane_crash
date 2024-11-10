@@ -1,0 +1,70 @@
+---
+title: "Fear of Flying - Risk Evaluation"
+format: html
+editor: visual
+---
+
+\
+
+## Fear of Flying
+
+(Insert language that expounds on the fear of flying).
+
+## What Does the Data Say?
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(janitor)
+
+
+# data taken from here: https://www.kaggle.com/datasets/yyxian/u-s-airline-traffic-data/code
+airtraffic <- read_csv("C:\\Users\\joefo\\Files\\coding_projects\\flying_risk_eval\\data\\airtraffic.csv")
+
+airtraffic2 <- airtraffic %>% 
+  janitor::clean_names() %>%
+  select(year, month, pax, flt) %>%
+  rename(passengers_total = pax, flights_total = flt)
+  
+crashdata <- read_csv("C:\\Users\\joefo\\Files\\coding_projects\\flying_risk_eval\\data\\crashdata.csv")
+
+crashdata2 <- crashdata %>%
+  janitor::clean_names()
+
+crashdata2 <- crashdata2 %>%
+  mutate(event_date = date(event_date)) %>%
+  filter(year(event_date) >= 2003) %>%
+  select(event_date, city, state, country, highest_injury_level:probable_cause, make, model)
+
+unique_values <- lapply(colnames(crashdata2), function(elem){
+  
+ x <- unique(crashdata2[[elem]])
+ return(x)
+  
+})
+
+names(unique_values) <- colnames(crashdata2)
+
+test <- crashdata2 %>% 
+  group_by(make, model) %>% 
+  filter(str_detect(tolower(make), "boeing|airbus")) %>% 
+  summarise(n = n())
+
+```
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+Thi
