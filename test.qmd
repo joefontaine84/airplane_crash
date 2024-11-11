@@ -2,8 +2,8 @@
 title: "Fear of Flying - Risk Evaluation"
 format: html
 editor: visual
----
-# test
+--- 
+
 \
 
 ## Fear of Flying
@@ -17,38 +17,72 @@ library(tidyverse)
 library(readxl)
 library(janitor)
 
+# Get air traffic data (total commercial passenger flights per year) ----------
 
 # data taken from here: https://www.kaggle.com/datasets/yyxian/u-s-airline-traffic-data/code
-airtraffic <- read_csv("C:\\Users\\joefo\\Files\\coding_projects\\flying_risk_eval\\data\\airtraffic.csv")
+airtraffic <- read_csv("data/airtraffic.csv")
 
 airtraffic2 <- airtraffic %>% 
   janitor::clean_names() %>%
   select(year, month, pax, flt) %>%
   rename(passengers_total = pax, flights_total = flt)
+
+# Get airplane crash data ------------------------------------------------------
+
+## Get full file paths for data download
+files <- list.files(path = paste0(getwd(), "/data/ntsb_data"), full.names = TRUE)
+
+
+ntsb_data <- lapply(files, function(file) {
   
-crashdata <- read_csv("C:\\Users\\joefo\\Files\\coding_projects\\flying_risk_eval\\data\\crashdata.csv")
-
-crashdata2 <- crashdata %>%
-  janitor::clean_names()
-
-crashdata2 <- crashdata2 %>%
-  mutate(event_date = date(event_date)) %>%
-  filter(year(event_date) >= 2003) %>%
-  select(event_date, city, state, country, highest_injury_level:probable_cause, make, model)
-
-unique_values <- lapply(colnames(crashdata2), function(elem){
+  df <- read_csv(file)
+  df <- df %>% 
+    janitor::clean_names()
+  return(df)
   
- x <- unique(crashdata2[[elem]])
- return(x)
-  
-})
+}) 
 
-names(unique_values) <- colnames(crashdata2)
+## Apply the names of the file to the ntsb_data object to more easily identify different dataframes
 
-test <- crashdata2 %>% 
-  group_by(make, model) %>% 
-  filter(str_detect(tolower(make), "boeing|airbus")) %>% 
-  summarise(n = n())
+file_names <- list.files(path = paste0(getwd(), "/data/ntsb_data"), full.names = FALSE)
+file_names <- gsub(".txt", "", file_names)
+names(ntsb_data) <- file_names
+
+
+# Questions / Mental Outline  --------------------------------------------------
+
+## What questions am I trying to answer?
+
+### Number of commercial passenger planes that experienced any type of incident
+### Number of commercial passenger planes that experienced any type of injury or death
+### Numbre of commercail passenger planes that experienced fatalities
+
+## First step --> isolate commercial planes
+
+data_dictionary <- ntsb_data$eADMSPUB_DataDictionary
+
+test <- data_dictionary %>% filter(table == "events")
+
+# dt_events: logs changes made to event IDs
+
+
+
+
+
+
+# unique_values <- lapply(colnames(crashdata2), function(elem){
+#   
+#  x <- unique(crashdata2[[elem]])
+#  return(x)
+#   
+# })
+# 
+# names(unique_values) <- colnames(crashdata2)
+
+# test <- crashdata2 %>% 
+#   group_by(make, model) %>% 
+#   filter(str_detect(tolower(make), "boeing|airbus")) %>% 
+#   summarise(n = n())
 
 ```
 
