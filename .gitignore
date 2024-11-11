@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+data/
+data/ntsb_data/
