@@ -2,7 +2,7 @@
 title: "Fear of Flying - Risk Evaluation"
 format: html
 editor: visual
---- 
+---
 
 \
 
@@ -17,7 +17,7 @@ library(tidyverse)
 library(readxl)
 library(janitor)
 
-# Get air traffic data (total commercial passenger flights per year) ----------
+# Air traffic data (total commercial passenger flights per year) ----------
 
 # data taken from here: https://www.kaggle.com/datasets/yyxian/u-s-airline-traffic-data/code
 airtraffic <- read_csv("data/airtraffic.csv")
@@ -27,7 +27,7 @@ airtraffic2 <- airtraffic %>%
   select(year, month, pax, flt) %>%
   rename(passengers_total = pax, flights_total = flt)
 
-# Get airplane crash data ------------------------------------------------------
+# Airplane crash data ------------------------------------------------------
 
 ## Get full file paths for data download
 files <- list.files(path = paste0(getwd(), "/data/ntsb_data"), full.names = TRUE)
@@ -48,6 +48,29 @@ file_names <- list.files(path = paste0(getwd(), "/data/ntsb_data"), full.names =
 file_names <- gsub(".txt", "", file_names)
 names(ntsb_data) <- file_names
 
+## Select columns from the "events" table -------------------------------------
+events <- ntsb_data$events %>%
+  select(ev_id, ntsb_no, ev_type, ev_date, ev_city, ev_state, ev_country,
+         mid_air, on_ground_collision, latitude, longitude)
+
+
+## Select columjns from the "aircraft" table ----------------------------------
+
+aircraft <- ntsb_data$aircraft %>%
+  select(ev_id, aircraft_key, ntsb_no, acft_make, 
+         acft_model, acft_category, pax_seats, owner_acft)
+
+## Select columns from the "injury" table -------------------------------------
+
+injury <- ntsb_data$injury %>%
+  select(ev_id, aircraft_key, inj_person_category, injury_level, inj_person_count)
+
+
+# Left off: -----------
+
+# look for commercial flight distinguisher besides pax_seats
+# combine events, aircraft, and injury tables?
+
 
 # Questions / Mental Outline  --------------------------------------------------
 
@@ -56,6 +79,8 @@ names(ntsb_data) <- file_names
 ### Number of commercial passenger planes that experienced any type of incident
 ### Number of commercial passenger planes that experienced any type of injury or death
 ### Numbre of commercail passenger planes that experienced fatalities
+
+## There is one ev_id per incident, but one incident could invole more than one aircraft.
 
 ## First step --> isolate commercial planes
 
