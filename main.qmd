@@ -1,0 +1,103 @@
+---
+title: "Fear of Flying - Risk Evaluation"
+format: html
+editor: visual
+---
+
+## Fear of Flying
+
+Many people are fearful of flying on commercial passenger airplanes for a multitude of reasons. More specifically, people may experience fear regarding whether their flight will have safe passage. Why? After all, if you conduct a quick internet search, it appears that flying is considered the safest method of transportation. Let's take a deeper dive into what the data says.
+
+## What Does the Data Say?
+
+```{r}
+#| echo: false
+
+library(tidyverse)
+
+load("airtraffic.Rdata")
+load("aircraft_events.Rdata")
+
+# summary stats on airtraffic data --------------------------------------------
+
+airtraffic_sum_stats <- airtraffic %>%
+  group_by(unique_carrier_name, year) %>%
+  summarize(
+    num_flights = n()
+  ) %>%
+  rename(airline_name = unique_carrier_name) %>%
+  ungroup()
+
+# summary stats on aircraft_events data ---------------------------------------
+
+aircraft_events_sum_stats <- aircraft_events %>%
+  group_by(owner_acft, year, month) %>% summarize(
+    num_aircraft_in_incident = n()
+  ) %>% 
+  rename(airline_name = owner_acft) %>%
+  ungroup()
+
+## create temp df to join to sum stat -----------------------------------------
+
+# the temp df includes all months of all years of interest for all airlines,
+# even if there are no records for that month
+timeframe <- seq(from = as.Date("2008-01-01"), to = as.Date("2024-12-01"), by = "month")
+airline_name <- unique(aircraft_events$owner_acft)
+
+temp_df <- data.frame(
+  
+  airline_name = rep(airline_name, each = length(timeframe)),
+  timeframe = rep(timeframe, times = length(airline_name))
+
+) %>% 
+  mutate(
+  year = year(timeframe),
+  month = month(timeframe)) %>%
+  select(-timeframe)
+
+aircraft_events_sum_stats <- temp_df %>%
+  left_join(., aircraft_events_sum_stats, by = join_by(airline_name, year, month)) %>%
+  mutate(num_aircraft_in_incident = if_else(is.na(num_aircraft_in_incident), 0, num_aircraft_in_incident))
+
+# combined stats -------------------------------------------------------------
+
+combined_stat_month <- airtraffic_sum_stats %>%
+  left_join(., aircraft_events_sum_stats) %>%
+  mutate(num_aircraft_in_incident = case_when(
+    
+    is.na(num_aircraft_in_incident) ~ 0,
+    TRUE ~ num_aircraft_in_incident
+    
+  ))
+
+combined_stat_year <- combined_stat_month %>%
+  group_by(airline_name, year) %>% 
+  summarize(
+    total_flights = sum(num_flights),
+    total_incidents = sum(num_aircraft_in_incident)
+  )
+
+combined_total <- combined_stat_month %>% 
+  group_by(airline_name) %>%
+  summarize(
+    total_flights = sum(num_flights),
+    total_incidents = sum(num_aircraft_in_incident)
+  ) %>%
+  mutate(prcnt_incid = (total_incidents/total_flights) * 100)
+
+```
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+You can add options to executable code like this
+
+```{r}
+#| echo: false
+2 * 2
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
