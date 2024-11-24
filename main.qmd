@@ -2,16 +2,50 @@
 title: "Fear of Flying - Risk Evaluation"
 format: html
 editor: visual
+output-file: test.html
 ---
 
 ## Fear of Flying
 
-Many people are fearful of flying on commercial passenger airplanes for a multitude of reasons. More specifically, people may experience fear regarding whether their flight will have safe passage. Why? After all, if you conduct a quick internet search, it appears that flying is considered the safest method of transportation. Let's take a deeper dive into what the data says.
+Many people are fearful of flying on commercial passenger airplanes for a multitude of reasons. More specifically, people may experience fear regarding whether their flight will have safe passage. Why are people fearful? After all, if you conduct a quick internet search, it appears that flying is considered the safest method of transportation.
+
+Let's take a deeper dive into what the data says.
 
 ## What Does the Data Say?
 
+To analyze how safe commercial passenger airplanes are, one approach is to get the total number of commercial passenger flights that have occurred over a given period of time. The region in which this analysis will occur is the United States, where both the departure and arrival locations are in the United States or where either the departure or arrival locations are in the United States.
+
+Moreover, we can narrow down the fear of flying to be more specific. If you are located in the United States, you are likely to fly on the most popular airline carriers, such as:
+
+-   JetBlue Airways
+
+-   Southwest Airlines
+
+-   American Airlines
+
+-   Delta Airlines
+
+-   Continental Airlines
+
+-   Frontier Airlines
+
+-   SkyWest Airlines
+
+-   Allegiant Airlines
+
+-   Spirit Airlines
+
+-   United Airlines
+
+So, this analysis will focus on the ten (10) carriers mentioned above.
+
+### Total Flights by Air Carrier
+
+Let's take a look at the total number of flights by air carrier. The date range selected was from January 2008 - November 2024. Flight totals are presented by month.
+
 ```{r}
 #| echo: false
+#| warning: false
 
 library(tidyverse)
 
@@ -27,6 +61,18 @@ airtraffic_sum_stats <- airtraffic %>%
   ) %>%
   rename(airline_name = unique_carrier_name) %>%
   ungroup()
+
+p <- ggplot(airtraffic_sum_stats, aes(year, num_flights, group = airline_name, color = airline_name)) +
+  geom_line(linewidth = 1) +
+  theme_bw() + 
+  labs(
+    y = "Number of Flights",
+    color = "Airline Name"
+  ) +
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.title.y = element_text(margin = margin(r=10)))
+
+p
 
 # summary stats on aircraft_events data ---------------------------------------
 
