@@ -1,6 +1,7 @@
 ---
 title: "Fear of Flying - Risk Evaluation"
 format: html
+df-print: kable
 editor: visual
 output-file: index.html
 ---
@@ -41,7 +42,7 @@ So, this analysis will focus on the ten (10) carriers mentioned above.
 
 ### Total Flights by Air Carrier
 
-Let's take a look at the total number of flights by air carrier. The date range selected was from January 2008 - November 2024. Flight totals are presented by month.
+Let's take a look at the total number of flights by air carrier. The date range selected was from January 2008 - August 2024. Flight totals are presented by month. The total number of flights for each airline was collected from the Bureau of Transportation Statistics (BTS). Below is a table that shows the total number of flights by airline within this time period:
 
 ```{r}
 #| echo: false
@@ -62,21 +63,11 @@ airtraffic_sum_stats <- airtraffic %>%
   rename(airline_name = unique_carrier_name) %>%
   ungroup()
 
-p <- ggplot(airtraffic_sum_stats, aes(year, num_flights, group = airline_name, color = airline_name)) +
-  geom_line(linewidth = 1) +
-  theme_bw() + 
-  labs(
-    y = "Number of Flights",
-    color = "Airline Name"
-  ) +
-  theme(axis.title.x = element_blank()) + 
-  theme(axis.title.y = element_text(margin = margin(r=10)))
-
-p
-
 # summary stats on aircraft_events data ---------------------------------------
 
 aircraft_events_sum_stats <- aircraft_events %>%
+  # filter is applied to match the same time period as airtraffic
+  filter(!(year == 2024 & month > 8)) %>%
   group_by(owner_acft, year, month) %>% summarize(
     num_aircraft_in_incident = n()
   ) %>% 
@@ -104,6 +95,9 @@ temp_df <- data.frame(
 aircraft_events_sum_stats <- temp_df %>%
   left_join(., aircraft_events_sum_stats, by = join_by(airline_name, year, month)) %>%
   mutate(num_aircraft_in_incident = if_else(is.na(num_aircraft_in_incident), 0, num_aircraft_in_incident))
+
+aircraft_events_sum_stats <- aircraft_events_sum_stats %>%
+  filter(!(year == 2024 & month > 8))
 
 # combined stats -------------------------------------------------------------
 
@@ -133,17 +127,98 @@ combined_total <- combined_stat_month %>%
 
 ```
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+#| echo: false
+#| warning: false
+
+total_flights <- combined_total %>%
+  select(-c(prcnt_incid, total_incidents))
+
+total_flights
+
 ```
 
-You can add options to executable code like this
+\
+
+To further illustrate the total number of flights by airline over time from January 2008 - August 2024, a graph is included below:
 
 ```{r}
 #| echo: false
-2 * 2
+#| warning: false
+
+p <- ggplot(airtraffic_sum_stats, aes(year, num_flights, group = airline_name, color = airline_name)) +
+  geom_line(linewidth = 1) +
+  theme_bw() + 
+  labs(
+    y = "Number of Flights",
+    color = "Airline Name"
+  ) +
+  scale_x_continuous(limits = c(2008, 2025)) +
+  scale_y_continuous(limits = c(0, 60000)) +
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.title.y = element_text(margin = margin(r=10)))
+
+
+p
+
+
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+### Total Incidents by Air Carrier
+
+Now, let's take a look at the number of "events" reported by the National Transportation Safety Board (NTSB). The NTSB, from an aviation perspective, is tasked with investigating civil cases of airplane accidents/incidents. The accidents/incidents vary in severity and are dependent on the level of damage sustained by the aircraft and the level of injury sustained by passengers. Here are the number of incidents investigated by the NTSB from the timeframe of January 2008 - August 2024:
+
+```{r}
+#| echo: false
+#| warning: false
+
+aircraft_events_sum_stats_all <- aircraft_events_sum_stats %>%
+  group_by(airline_name) %>%
+  summarize(num_incidents = sum(num_aircraft_in_incident))
+
+aircraft_events_sum_stats_all
+
+
+```
+Here are the number of incidents that have occurred over time, organized by airline:
+
+```{r}
+#| echo: false
+#| warning: false
+
+aircraft_events_sum_stats_year <- aircraft_events_sum_stats %>%
+  group_by(airline_name, year) %>%
+  summarize(num_incidents = sum(num_aircraft_in_incident))
+
+
+p <- ggplot(aircraft_events_sum_stats_year, aes(year, num_incidents)) +
+  geom_line() +
+  theme_bw() + 
+  labs(
+    y = "Number of Aircraft in Incident",
+    color = "Airline Name"
+  ) +
+  scale_x_continuous(limits = c(2008, 2025)) +
+  scale_y_continuous(limits = c(0, 20)) +
+  theme(axis.title.x = element_blank()) + 
+  theme(axis.title.y = element_text(margin = margin(r=10)))
+
+p <- p + facet_wrap(vars(airline_name))
+
+p
+
+
+```
+
+As the data shows above, some airlines have experienced more incidents over time. Let's normalize the number of incidents endured by each airline by the number of each airline's flights. The last column in the table below - the "prcnt_incid" column - represents each airline's rate of their respective craft experiencing an incident.
+
+```{r}
+#| echo: false
+#| warning: false
+
+
+combined_total
+
+
+```
+
