@@ -2,7 +2,7 @@
 title: "Fear of Flying - Risk Evaluation"
 format: html
 editor: visual
-output-file: test.html
+output-file: index.html
 ---
 
 ## Fear of Flying
