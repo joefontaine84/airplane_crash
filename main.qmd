@@ -222,3 +222,22 @@ combined_total
 
 ```
 
+Now, let's look at how the "prcnt_incid" field is displayed in a graphical format:
+
+```{r}
+
+p <- ggplot(combined_total, aes(airline_name, prcnt_incid, fill = airline_name)) +
+  geom_bar(stat = "identity", show.legend = FALSE) + 
+  theme_bw() +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_text(margin = margin(r = 10))) +
+  labs(y = "Percent Incident Rate") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  theme(axis.text.x = element_text(vjust = 0.5))
+  
+
+p
+
+
+
+```
