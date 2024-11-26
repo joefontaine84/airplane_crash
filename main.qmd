@@ -180,6 +180,7 @@ aircraft_events_sum_stats_all
 
 
 ```
+
 Here are the number of incidents that have occurred over time, organized by airline:
 
 ```{r}
@@ -225,6 +226,8 @@ combined_total
 Now, let's look at how the "prcnt_incid" field is displayed in a graphical format:
 
 ```{r}
+#| echo: false
+#| warning: false
 
 p <- ggplot(combined_total, aes(airline_name, prcnt_incid, fill = airline_name)) +
   geom_bar(stat = "identity", show.legend = FALSE) + 
@@ -241,3 +244,37 @@ p
 
 
 ```
+
+Here are some summary statistics on each airline's ratio of aircraft involved in an incident relative to the total flights flown:
+
+```{r}
+#| echo: false
+#| warning: false
+
+sum_stats <- combined_total %>%
+  summarize(
+    min = min(prcnt_incid),
+    max = max(prcnt_incid),
+    mean = mean(prcnt_incid),
+    median = median(prcnt_incid)
+  )
+
+sum_stats
+
+
+
+```
+
+## Conclusions
+
+Some conclusions that come from the data above are the following:
+
+1.  The airline with the highest ratio (0.002 %) of their aircraft involved in incidents relative to the number of flights flown (hereinafter referred to as the "ratio") is American Airlines.
+2.  The average ratio of all airlines part of this study is 0.00084 %.
+3.  Even with this ratio, this means there is a 1 in 50,000 chance that a plane will experience an *incident*; again, an incident can have a variety of different meanings that can range from minor aircraft damage to crashes.
+
+## Notes on the Data
+
+-   The NTSB data covers incidents that occur by US air carriers in both domestic and international locations. The BTS data includes both domestic and international locations as well; however, if the flight's origin and destination are both located on international ground, then this is excluded. See the "T-100 Segment (US Carriers Only)" table located here: [https://www.transtats.bts.gov/Tables.asp?QO_VQ=EED&QO_anzr=Nv4%FDPn44vr4%FDf6n6v56vp5%FD%FLS14z%FDHE%FDg4nssvp%FM-%FD%FDh.f.%FDPn44vr45&QO_fu146_anzr=Nv4%FDPn44vr45](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EED&QO_anzr=Nv4%FDPn44vr4%FDf6n6v56vp5%FD%FLS14z%FDHE%FDg4nssvp%FM-%FD%FDh.f.%FDPn44vr45&QO_fu146_anzr=Nv4%FDPn44vr45).
+
+-   NTSB data can be obtained here: <https://data.ntsb.gov/avdata>
