@@ -310,7 +310,7 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </div>
 </div>
-<p>Here are some summary statistics on each airline’s ratio of aircraft involved in an incident relative to the total flights flown:</p>
+<p>Here are summary statistics across all airline’s ratio of aircraft involved in an incident relative to the total flights flown:</p>
 <div class="cell">
 <div class="cell-output-display">
 <div class="kable-table">
@@ -337,8 +337,63 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </section>
-<section id="conclusions" class="level1">
-<h1>Conclusions</h1>
+<section id="types-of-incidents" class="level2">
+<h2 class="anchored" data-anchor-id="types-of-incidents">Types of Incidents</h2>
+<p>It is important to remember that the NTSB data shown above is inclusive of all types of incidents. Some of these incidents cause no harm to the passengers on board, while other incidents can be more serious. <strong><em>For example, among the airlines involved in this study, there are only 2 incidents out of 3,084,159 flights that resulted in fatalities between January 2008 - August 2024, which corresponds to a 0.000065 % rate that these U.S. air carriers collectively experience a fatal incident.</em></strong></p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="kable-table">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Highest Injury</th>
+<th style="text-align: right;">Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Fatal</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Minor</td>
+<td style="text-align: right;">21</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">None</td>
+<td style="text-align: right;">182</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Serious</td>
+<td style="text-align: right;">149</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">NA</td>
+<td style="text-align: right;">46</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>What gives with the NTSB reporting the “Highest Injury” as NA, though? To ensure there aren’t unaccounted for flights that endured some level of passenger injury, we can take a look at the incidents that have an NA value in the “Highest Injury” column by investigating the NTSB narratives for each event. Examples of one of these narratives are included below:</p>
+<p>Example 1:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>$Narrative
+[1] "On September 7, 2009 at approximately 2100 EDT a Delta Air Lines (DAL) 767, N840MH, operating as flight 186, was two hours enroute from John F. Kennedy International Airport (JFK) to Venice Marco Polo Airport (VCE), when the cabin lights flickered, the Passenger Address System was intermittent and then inop, the left side oxygen masks deployed and a sulphur smell was observed, but no smoke. The flight diverted to ATL and landed without incident. There were 206 passengers, 8 cabin crew and three flight crew and no injuries were reported. \r\n\r\nDAL maintenance crews examined the area above the forward lavatory on the left side and found a wire bundle which had numerous fractured and melted wires, with soot on the bundle and immediate area. There were also signs of chaffing on a piece of support structure near the cable routing. \r\n\r\nA review of the Boeing wire installation drawings revealed that the damaged wire bundle was routed incorrectly and not properly secured. DAL performed a fleet inspection and found one other airplane with this wire bundle incorrectly routed. It was not damaged and they corrected the installation.  The investigation did not determine if the incorrect routing occurred during manufacturing, maintenance, or modifications.\r\n\r\nA review of the wires in the bundle confirmed that oxygen system, passenger address system, and lavatory power wires were included in the bundle."</code></pre>
+</div>
+</div>
+<p>Example 2:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>$Narrative
+[1] "The German Federal Bureau of Aircraft Accident Investigation (BFU) has notified the NTSB of an accident involving a Boeing 747 that occurred on October 22, 2014. The NTSB has appointed a U.S. Accredited Representative to assist the BFU's investigation under the provisions of ICAO Annex 13 as the State of Operator and State of Manufacturer and Design of the airplane.\r\n\r\nAll investigative information will be released by the BFU."</code></pre>
+</div>
+</div>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
 <p>Some conclusions that come from the data above are the following:</p>
 <ol type="1">
 <li>The airline with the highest ratio (0.002 %) of their aircraft involved in incidents relative to the number of flights flown (hereinafter referred to as the “ratio”) is American Airlines.</li>
@@ -346,8 +401,8 @@ ul.task-list li input[type="checkbox"] {
 <li>Even with this ratio, this means there is a 1 in 50,000 chance that a plane will experience an <em>incident</em>; again, an incident can have a variety of different meanings that can range from minor aircraft damage to crashes.</li>
 </ol>
 </section>
-<section id="notes-on-the-data" class="level1">
-<h1>Notes on the Data</h1>
+<section id="notes-on-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="notes-on-the-data">Notes on the Data</h2>
 <ul>
 <li><p>The NTSB data covers incidents that occur by US air carriers in both domestic and international locations. The BTS data includes both domestic and international locations as well; however, if the flight’s origin and destination are both located on international ground, then this is excluded. See the “T-100 Segment (US Carriers Only)” table located here: <a href="https://www.transtats.bts.gov/Tables.asp?QO_VQ=EED&amp;QO_anzr=Nv4%FDPn44vr4%FDf6n6v56vp5%FD%FLS14z%FDHE%FDg4nssvp%FM-%FD%FDh.f.%FDPn44vr45&amp;QO_fu146_anzr=Nv4%FDPn44vr45">https://www.transtats.bts.gov/Tables.asp?QO_VQ=EED&amp;QO_anzr=Nv4%FDPn44vr4%FDf6n6v56vp5%FD%FLS14z%FDHE%FDg4nssvp%FM-%FD%FDh.f.%FDPn44vr45&amp;QO_fu146_anzr=Nv4%FDPn44vr45</a>.</p></li>
 <li><p>NTSB data can be obtained here: <a href="https://data.ntsb.gov/avdata" class="uri">https://data.ntsb.gov/avdata</a></p></li>

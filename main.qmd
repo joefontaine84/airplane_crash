@@ -269,8 +269,6 @@ sum_stats
 
 It is important to remember that the NTSB data shown above is inclusive of all types of incidents. Some of these incidents cause no harm to the passengers on board, while other incidents can be more serious. ***For example, among the airlines involved in this study, there are only 2 incidents out of 3,084,159 flights that resulted in fatalities between January 2008 - August 2024, which corresponds to a 0.000065 % rate that these U.S. air carriers collectively experience a fatal incident.***
 
-\*\*\*This means that, out of the 3,084,159 flights involved in this study, 2
-
 ```{r}
 #| echo: false
 #| warning: false
@@ -298,6 +296,48 @@ all_events_sumstats <- aircraft_events %>%
 all_events_sumstats
 
 ```
+
+What gives with the NTSB reporting the "Highest Injury" as NA, though? To ensure there aren't unaccounted for flights that endured some level of passenger injury, we can take a look at the incidents that have an NA value in the "Highest Injury" column by investigating the NTSB narratives for each event. Examples of one of these narratives are included below:
+
+Example 1:
+
+```{r}
+#| echo: false
+#| warning: false
+
+na_narratives <- aircraft_events %>%
+  filter(is.na(ev_highest_injury)) %>%
+  select(ev_id, narr_accp) %>%
+  rename(`Event ID` = ev_id,
+         Narrative = narr_accp)
+
+
+x <- as.vector(na_narratives[1, 2])
+
+x
+
+```
+Example 2:
+```{r}
+#| echo: false
+#| warning: false
+
+na_narratives <- aircraft_events %>%
+  filter(is.na(ev_highest_injury)) %>%
+  select(ev_id, narr_accp) %>%
+  rename(`Event ID` = ev_id,
+         Narrative = narr_accp)
+
+
+x <- as.vector(na_narratives[13, 2])
+
+x
+
+```
+
+
+
+
 
 ## Conclusions
 

@@ -4,7 +4,7 @@ library(janitor)
 
 # NTSB incident data ------------------------------------------------------
 
-## Get full file paths for data download
+## Get full file paths for data download ---------------------------------
 files <- list.files(path = paste0(getwd(), "/data/ntsb_data"), full.names = TRUE)
 
 ntsb_data <- lapply(files, function(file) {
@@ -16,7 +16,7 @@ ntsb_data <- lapply(files, function(file) {
   
 }) 
 
-## Apply the names of the file to the ntsb_data object to more easily identify different dataframes
+## Apply the names of the file to the ntsb_data object to more easily identify different dataframes -----
 
 file_names <- list.files(path = paste0(getwd(), "/data/ntsb_data"), full.names = FALSE)
 file_names <- gsub(".txt", "", file_names)
@@ -28,7 +28,7 @@ events <- ntsb_data$events %>%
          ev_highest_injury, mid_air, on_ground_collision, latitude, longitude)
 
 
-## Select columnss from the "aircraft" table ----------------------------------
+## Select columns from the "aircraft" table ----------------------------------
 
 aircraft <- ntsb_data$aircraft %>%
   select(ev_id, aircraft_key, ntsb_no, acft_make, 
@@ -44,12 +44,24 @@ aircraft <- aircraft %>%
   allegiant|frontier|spirit|continental) air\\s?lines|\\Aunited\\Z|jet\\s?blue"))
 
 
+## Select columns from the "narratives" table -----------------------------------
+
+narratives <- ntsb_data$narratives %>%
+  select(ev_id, narr_accp) %>%
+  group_by(ev_id) %>%
+  # some events have more than one narrative but it seems that the difference
+  # between the narratives are minor. There should only be one narrative per event.
+  slice_head()
+
+# Combine Data ----------------------------------------------------------------
+
 aircraft_events <- left_join(aircraft, events, by = join_by(ev_id)) %>%
   select(ev_id, ev_date, everything()) %>%
   mutate(ev_date = as.Date(ev_date, "%m/%d/%Y"),
          year = year(ev_date),
          month = month(ev_date)) %>%
-  relocate(year, month, .after = ev_date)
+  relocate(year, month, .after = ev_date) %>%
+  left_join(., narratives, by = join_by(ev_id))
   
 ## combine all similar spellings of each airline carrier ----------------------
 
