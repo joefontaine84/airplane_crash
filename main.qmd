@@ -245,7 +245,7 @@ p
 
 ```
 
-Here are some summary statistics on each airline's ratio of aircraft involved in an incident relative to the total flights flown:
+Here are summary statistics across all airline's ratio of aircraft involved in an incident relative to the total flights flown:
 
 ```{r}
 #| echo: false
@@ -262,6 +262,40 @@ sum_stats <- combined_total %>%
 sum_stats
 
 
+
+```
+
+## Types of Incidents
+
+It is important to remember that the NTSB data shown above is inclusive of all types of incidents. Some of these incidents cause no harm to the passengers on board, while other incidents can be more serious. ***For example, among the airlines involved in this study, there are only 2 incidents out of 3,084,159 flights that resulted in fatalities between January 2008 - August 2024, which corresponds to a 0.000065 % rate that these U.S. air carriers collectively experience a fatal incident.***
+
+\*\*\*This means that, out of the 3,084,159 flights involved in this study, 2
+
+```{r}
+#| echo: false
+#| warning: false
+
+all_events_sumstats <- aircraft_events %>%
+  group_by(ev_highest_injury) %>%
+  summarize(
+    
+    Count = n()
+    
+  ) %>%
+  rename(`Highest Injury` = ev_highest_injury) %>%
+  mutate(`Highest Injury` = case_when(
+    
+    `Highest Injury` == "FATL" ~ "Fatal",
+    `Highest Injury` == "MINR" ~ "Minor",
+    `Highest Injury` == "SERS" ~ "Serious",
+    `Highest Injury` == "NONE" ~ "None",
+    is.na(`Highest Injury`) ~ "NA",
+    TRUE ~ NA
+    
+    
+  ))
+
+all_events_sumstats
 
 ```
 
