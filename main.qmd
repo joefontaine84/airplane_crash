@@ -1,7 +1,7 @@
 ---
 title: "How Safe is Flying?"
 format: html
-df-print: kable
+#df-print: flextable
 editor: visual
 output-file: index.html
 ---
@@ -56,6 +56,30 @@ Below is a table that shows the total number of flights by airline within the pr
 
 library(tidyverse)
 library(knitr)
+library(flextable)
+
+
+# function for formatting flextables ------------------------------------------
+
+df_formatting <- function(df) {
+  
+  ft <- flextable(df)
+  
+  ft <- ft %>% 
+    theme_vanilla() %>%
+    vline() %>%
+    border_outer() %>%
+    align(align = "center", part = "all") %>%
+    flextable::bg(bg = "grey", part = "header") %>%
+    autofit()
+
+  return(ft)  
+  
+  
+}
+
+
+# load data -------------------------------------------------------------------
 
 load("airtraffic.Rdata")
 load("aircraft_events.Rdata")
@@ -138,16 +162,17 @@ combined_total <- combined_stat_month %>%
 #| echo: false
 #| warning: false
 
+
 total_flights <- combined_total %>%
   select(-c(prcnt_incid, total_incidents)) %>%
   rename(`Airline Name` = airline_name,
          `Total Flights` = total_flights)
 
-total_flights
+df_formatting(total_flights)
 
 ```
 
-**Based on the above table, the total number of flights across all airlines equals 3,084,159.**
+**Based on the above table, the total number of flights across all airlines equals 36,224,208.**
 
 It may be useful to visualize the number of flights by airline in graphical format to see which airlines are more popular than others. As such, a graph displaying this information is provided below:
 
@@ -191,10 +216,10 @@ Below are the number of incidents investigated by the NTSB relative to this stud
 
 aircraft_events_sum_stats_all <- aircraft_events_sum_stats %>%
   group_by(airline_name) %>%
-  summarize(`Number of Incidents` = sum(num_aircraft_in_incident)) %>%
+  summarize(`Number of Events` = sum(num_aircraft_in_incident)) %>%
   rename(`Airline Name` = airline_name)
 
-aircraft_events_sum_stats_all
+df_formatting(aircraft_events_sum_stats_all)
 
 
 ```
@@ -214,7 +239,7 @@ p <- ggplot(aircraft_events_sum_stats_year, aes(year, num_incidents)) +
   geom_line() +
   theme_bw() + 
   labs(
-    y = "Number of Aircraft in Incident",
+    y = "Number of Aircraft in an NTSB Event",
     color = "Airline Name"
   ) +
   scale_x_continuous(limits = c(2008, 2025)) +
@@ -246,7 +271,7 @@ combined_total_display <- combined_total %>%
          `Total Events` = total_incidents,
          `% Event Rate` = prcnt_incid)
 
-combined_total_display
+df_formatting(combined_total_display)
 
 
 ```
@@ -265,7 +290,7 @@ sum_stats <- combined_total %>%
     median = median(prcnt_incid)
   )
 
-sum_stats
+df_formatting(sum_stats)
 
 
 
@@ -282,7 +307,7 @@ p <- ggplot(combined_total, aes(airline_name, prcnt_incid, fill = airline_name))
   theme_bw() +
   theme(axis.title.x = element_blank()) +
   theme(axis.title.y = element_text(margin = margin(r = 10))) +
-  labs(y = "Percent Incident Rate") +
+  labs(y = "Percent NTSB Event Rate") +
   theme(axis.text.x = element_text(angle = 90)) +
   theme(axis.text.x = element_text(vjust = 0.5))
   
@@ -321,11 +346,11 @@ all_events_sumstats <- aircraft_events %>%
     
   ))
 
-all_events_sumstats
+df_formatting(all_events_sumstats)
 
 ```
 
-Based on the table above, ***among the airlines involved in this study, there are only 2 events out of the 3,084,159 flights that resulted in fatalities between January 2008 - August 2024, which corresponds to a 0.000065 % rate that these U.S. airlines collectively experience a fatal incident.***
+Based on the table above, ***among the airlines involved in this study, there are only 2 events out of the 36,224,208 flights that resulted in fatalities between January 2008 - August 2024, which corresponds to a 0.00000552 % rate that these U.S. airlines collectively experience a fatal incident.***
 
 What about the NA values in the "Highest Injury" column, though? To ensure there aren't unaccounted for flights that endured some level of passenger injury, we can take a look at the incidents that have an NA value in the "Highest Injury" column by investigating the NTSB narratives for each event. The narratives are lengthy, but some examples of these narratives are included below:
 
@@ -373,12 +398,18 @@ Upon review of the narratives where the "Highest Injury" value is NA, there did 
 
 Some conclusions that come from the data above are the following:
 
-1.  The airline with the highest ratio (0.002 %) of their aircraft involved in NTSB investigated events relative to the number of flights flown is American Airlines.
-2.  The average ratio of all airlines part of this study is 0.00084 %.
-3.  Even with this ratio, this means there is a 1 in 50,000 chance that a plane will experience an *incident*; again, an incident can have a variety of different meanings that can range from minor aircraft damage to crashes.
+1.  The airline with the highest ratio (0.002 %) of their aircraft involved in an NTSB investigated event relative to the number of flights flown is American Airlines. Even with this ratio, this means there is a 1 in 50,000 chance that an American Airlines plane will experience an *incident*; again, an incident can have a variety of different meanings that can range from minor aircraft damage to crashes.
+
+2.  The average ratio of aircraft involved in an NTSB event relative to the total flights flown for each U.S. airline part of this study is 0.00084 %.
+
+3.  Among the U.S. airlines involved in this study, there were only 2 flights out of 36,224,208 that resulted in fatalities between January 2008 - August 2024; this corresponds to a 0.00000552 % rate (1 in every 18,112,104 flights) that the U.S. airlines involved in this study collectively experience a fatal incident. 
+
+4. Among the U.S. airlines involved in this study, there were 151 flights out of 36,224,208 that resulted in fatalities or a serious injury between January 2008 - August 2024; this corresponds to a 0.000417 % rate (1 in every 239,895 flights) that the U.S. airlines involved in this study collectively experience an incident resulting in fatal or serious injuries. 
+
+## Answering the Question
+
+The conclusions formulated above can be used to answer the Question. Based on the data discussed herein, flying on U.S. commercial airlines - at least those that are part of this study - is safe since the data has shown a relatively low probability that any given flight will be involved in an NTSB event and a much smaller probability that any given flight will be involved in an NTSB event resulting in fatalities. 
 
 ## Notes on the Data
 
--   The NTSB data covers incidents that occur by US air carriers in both domestic and international locations. The BTS data includes both domestic and international locations as well; however, if the flight's origin and destination are both located on international ground, then this is excluded. See the "T-100 Segment (US Carriers Only)" table located here: [https://www.transtats.bts.gov/Tables.asp?QO_VQ=EED&QO_anzr=Nv4%FDPn44vr4%FDf6n6v56vp5%FD%FLS14z%FDHE%FDg4nssvp%FM-%FD%FDh.f.%FDPn44vr45&QO_fu146_anzr=Nv4%FDPn44vr45](https://www.transtats.bts.gov/Tables.asp?QO_VQ=EED&QO_anzr=Nv4%FDPn44vr4%FDf6n6v56vp5%FD%FLS14z%FDHE%FDg4nssvp%FM-%FD%FDh.f.%FDPn44vr45&QO_fu146_anzr=Nv4%FDPn44vr45).
-
--   NTSB data can be obtained here: <https://data.ntsb.gov/avdata>
+A few assumptions are made about the data used in this research. One assumption is that we assume the BTS data accurately records every domestic and international flight for all the airlines referenced herein. Again, international in this context means a flight where the destination or departing location is in the U.S., while the other location is in a foreign county. Secondly, we assume that the NTSB records the correct owner of the aircraft involved in an event for each of the airlines referenced in this study. 
